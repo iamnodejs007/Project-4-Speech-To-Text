@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Project 4</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+    <script src="./js/jquery-3.1.0.js" charset="utf-8"></script>
+    <script src="./js/materialize.min.js" charset="utf-8"></script>
+  </head>
+  <body class="grey lighten-2">
+    <!-- navbar -->
+    <nav>
+      <div class="nav-wrapper blue accent-2">
+        <a href="#" class="brand-logo"></a>
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+          <li><a href="sass.html">Sass</a></li>
+        </ul>
+      </div>
+    </nav>
+    <br><br><br>
+    <div class="container">
+      <div class="row">
+        <div class="col s6">
+          <form action="/upload" method="post" name="fileinfo">
+             <div class="file-field input-field">
+               <div class="btn">
+                 <span>Upload Audio File</span>
+                 <input id="file-input" type="file" name="file" accept="audio/*">
+                 <input type="hidden" id="audio-file" name="audio-file" value="">
+               </div>
+               <div class="file-path-wrapper">
+                 <input class="file-path validate" type="text" placeholder="Select a file to upload">
+               </div>
+             </div>
+           </form>
+        </div>
+        <div class="col s6">
+          <div class="input-field">
+            <input id="keywords" type="text" name="name" placeholder="Keywords to look for">
+          </div>
+        </div>
+        <div class="col s12">
+          <div id="progress-bar" class="">
+            <div class="indeterminate"></div>
+          </div>
+        </div>
+        <div id="result-box" class="col s6"></div>
+        <div id="keywords-box" class="col s6"></div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    function uploadFile(file, signedRequest, url){
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', signedRequest);
+
+
+    // the below code runs once a file has been added to the input field
+    xhr.onreadystatechange = () => {
+
+      var keywords = $('#keywords').val()
+      keywords = keywords.split(' ')
+
+      if(xhr.readyState === 4){
+        if(xhr.status === 200){
+          document.getElementById('audio-file').value = url;
+          $('#submit-audio').parent().removeClass('disabled')
+
+          $.ajax({
+            url: "/transcribe?keyword=" + keywords,
+            method: "GET",
+          }).done(function(data){
+            $('#progress-bar').removeClass('progress')
+            data = JSON.parse(data)
+            keywordsResult = data.results[0].keywords_result;
+            resultSpeech = data.results[0].alternatives[0].transcript;
+            $('#result-box').append('<p>' + resultSpeech + '</p>')
+
+            for (var key in keywordsResult) {
+              $('#keywords-box').append('<li><span style="text-decoration: underline">' + keywordsResult[key][0].normalized_text + '</span>' + ' was repeated ' + keywordsResult[key].length + ' ' + (keywordsResult[key].length > 1 ? 'times</li>' : 'time</li>'))
+            }
+          })
+        }
+        else{
+          alert('Could not upload file.');
+        }
+      }
+    };
+    xhr.send(file);
+    }
+
+    function getSignedRequest(file){
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', `/sign-s3?file-name=${file.name}&file-type=${file.type}`);
+    xhr.onreadystatechange = () => {
+      if(xhr.readyState === 4){
+        if(xhr.status === 200){
+          const response = JSON.parse(xhr.responseText);
+          console.log(xhr.responseText);
+          uploadFile(file, response.signedRequest, response.url);
+        }
+        else{
+          alert('Could not get signed URL.');
+        }
+      }
+    };
+    xhr.send();
+    }
+
+    /*
+    Function called when file input updated. If there is a file selected, then
+    start upload procedure by asking for a signed request from the app.
+    */
+    function initUpload(){
+    $('#progress-bar').addClass('progress') // progress bar on upload start
+    const files = document.getElementById('file-input').files;
+    const file = files[0];
+    if(file == null){
+      return alert('No file selected.');
+    }
+    getSignedRequest(file);
+    }
+
+    /*
+    Bind listeners when the page loads.
+    */
+    (() => {
+      document.getElementById('file-input').onchange = initUpload;
+    })();
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+    // // prevent default submit action
+    // $('#submit-audio').on('click', function(evt){
+    //   evt.preventDefault();
+    // })
+
+//     $(':file').change(function(){
+//     var file = this.files[0];
+//     var name = file.name;
+//     var size = file.size;
+//     var type = file.type;
+//     //Your validation
+// });
+    //
+    // $('#input').change(function(){
+    // //on change event
+    // file = $(this).prop('files')[0];
+    // console.log(file);
+    // formData = new FormData();
+    // formData.append("audio", file, 'testname');
+    // });
+
+    // $('#submit-audio').on('click', function() {
+    //   $.ajax({
+    //     url: "/transcribe",
+    //     method: "GET",
+    //   }).done(function(data){
+    //     data = JSON.parse(data)
+    //     console.log(data.results[0].alternatives[0].transcript);
+    //   })
+    // })
+
+    </script>
+
+  </body>
+</html>
