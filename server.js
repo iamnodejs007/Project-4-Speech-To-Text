@@ -3,8 +3,6 @@ var
   app = express(),
   dotenv = require('dotenv').load({silent: true}),
   AWS = require('aws-sdk'),
-  multer  = require('multer'),
-  upload = multer(),
   watson = require('watson-developer-cloud'),
   speech_to_text = watson.speech_to_text({
     username: process.env.STT_USERNAME,
@@ -15,7 +13,19 @@ var
   fs = require('fs'),
   mongoose = require('mongoose'),
   bodyParser = require('body-parser'),
-  port = process.env.PORT || 3000
+  ejs = require('ejs'),
+  ejsLayouts = require('express-ejs-layouts'),
+  flash = require('connect-flash'),
+  session = require('express-session'), // used to create cookies
+  cookieParser = require('cookie-parser'),
+  expressSession = require('express-session'),
+  methodOverride = require('method-override'),
+  hash = require('bcrypt-nodejs'),
+  path = require('path'),
+  passport = require('passport'),
+  port = process.env.PORT || 3000,
+  passportConfig = require('./config/passport.js'),
+  userRoutes = require('./routes/users.js')
 
 const S3_BUCKET = process.env.S3_BUCKET
 
@@ -27,45 +37,43 @@ mongoose.connect('mongodb://localhost/project-4', function(err){
   console.log("Connected to MongoDB (Project-4)");
 })
 
-// s3.getObject({Bucket: 'bucket', Key: 'key'}, function(err, data) {
-//   // ...
-// });
-
-//
-// var s3 = new AWS.S3();
-// var params = {Bucket: S3_BUCKET, Key: fileName};
-// s3.getObject(params, function(err, data) {
-//   console.log(data);
-// }
-// var file = require('fs').createWriteStream('/path/to/file.jpg');
-// s3.getObject(params).createReadStream().pipe(file);
-
-// var files = ['sample.wav'];
-// for (var file in files) {
-//   var params = {
-//     audio: fs.createReadStream(files[file]),
-//     content_type: 'audio/wav',
-//     timestamps: true,
-//     word_alternatives_threshold: 0.9,
-//     continuous: true
-//   };
-//
-//   speech_to_text.recognize(params, function(error, transcript) {
-//     if (error)
-//       console.log('error:', error);
-//     else
-//       console.log(JSON.stringify(transcript, null, 2));
-//   });
-// }
-
 // middleware
 app.use(express.static('./public'))
 app.use(bodyParser.json())
 app.use(logger('dev'))
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser())
+app.use(methodOverride(function(req, res){
+  if (req.body && typeof req.body === 'object' && '_method' in req.body) {
+    // look in urlencoded POST bodies and delete it
+    var method = req.body._method
+    delete req.body._method
+    return method
+  }
+}))
+
+// ejs configuration
+app.set('view engine', 'ejs')
+app.use(ejsLayouts)
+app.use(flash())
+
+// this is the session and passport middleware
+app.use(session({
+  cookie: {_expires: 60000000}, // 16.6 hours in milliseconds
+  secret: "yeayeayea", // this adds an encrypter version of this secret so that a user cant just add a cookie in the browser and be logged in...very cruial
+  resave: true, // if you are continually using the site, you will stay logged in as long as you want
+  saveUninitialized: false // means, "do you want to create a cookie even if the login fails?".. answer is NO
+}))
+app.use(passport.initialize())
+app.use(passport.session()) // this is what allows the cookie to get created, when necessary
+
+app.use(function(req, res, next) {
+  res.locals.user = req.user
+  next()
+})
+
 
 var params;
-
 app.get('/sign-s3', function(req, res) {
   var
     s3 = new AWS.S3(),
@@ -107,10 +115,10 @@ app.get('/transcribe', function(req, res) {
       content_type: 'audio/wav',
       timestamps: true,
       word_confidence: true,
-      word_alternatives_threshold: 0.7,
+      word_alternatives_threshold: 0.01,
       continuous: true,
       keywords: [req.query.keyword],
-      keywords_threshold: 0.3
+      keywords_threshold: 0.01
     };
 
   speech_to_text.recognize(params2, function(error, transcript) {
@@ -122,52 +130,19 @@ app.get('/transcribe', function(req, res) {
   });
 })
 
-
-
-
 app.post('/upload', function(req, res) {
   res.json({message: "POSTED", body: req.body})
 })
 
-// // Handle the form POST containing an audio file and return transcript (from mobile)
-// app.post('/transcribe', function(req, res){
-//     console.log(req.files);
-//     var file = req.files
-//     var readStream = fs.createReadStream(file.path);
-//     console.log("opened stream for " + file.path);
-//
-//     var params = {
-//         audio:readStream,
-//         content_type:'audio/l16; rate=16000; channels=1',
-//         continuous:"true"
-//     };
-//
-//     speechToText.recognize(params, function(err, response) {
-//
-//         readStream.close();
-//
-//         if (err) {
-//             return res.status(err.code || 500).json(err);
-//         } else {
-//             var result = {};
-//             if (response.results.length > 0) {
-//                 var finalResults = response.results.filter( isFinalResult );
-//
-//                 if ( finalResults.length > 0 ) {
-//                    result = finalResults[0].alternatives[0];
-//                 }
-//             }
-//             return res.send( result );
-//         }
-//     });
-// });
-//
-// function isFinalResult(value) {
-//     return value.final == true;
-// }
+app.get('/', function(req, res){
+  res.render('landing.ejs', {flash: req.flash('loginMessage')})
+})
 
+app.get('/index', function(req, res){
+  res.render('index.ejs')
+})
 
-
+app.use('/', userRoutes)
 
 // server
 app.listen(port, function(){
