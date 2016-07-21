@@ -1,114 +1,125 @@
     <br><br><br>
     <div class="container">
       <div class="row">
-        <div class="col s6">
-          <form action="/upload" method="post" name="fileinfo">
-             <div class="file-field input-field">
-               <div class="btn">
-                 <span>Upload Audio File</span>
-                 <input id="file-input" type="file" name="file" accept="audio/*">
-                 <input type="hidden" id="audio-file" name="audio-file" value="">
-               </div>
-               <div class="file-path-wrapper">
-                 <input class="file-path validate" type="text" placeholder="Select a file to upload">
-               </div>
-             </div>
-           </form>
-        </div>
-        <div class="col s6">
-          <div class="input-field">
-            <input id="keywords" type="text" name="name" placeholder="Keywords to look for">
-          </div>
-        </div>
         <div class="col s12">
-          <div id="progress-bar" class="">
-            <div class="indeterminate"></div>
+          <button class="waves-effect waves-light btn" id="start-recog" type="button" name="button">Start Recording</button>
+          <button class="waves-effect red btn hide" id="stop-recog" type="button" name="button">Pause Recording</button>
+          <button class="waves-effect red btn hide" id="analyze-recog" type="button" name="button">Analyze Recording</button>
+          <button class="waves-effect red btn hide" id="save-recog" type="button" name="button">Save Recording</button>
+          <div id="input-div" class="input-field">
+            <input id="keywords" type="text" name="name" placeholder="Keywords">
           </div>
+          <div id="result-box" class="col s6"></div>
+          <div id="keywords-box" class="col s6"></div>
         </div>
-        <div id="result-box" class="col s6"></div>
-        <div id="keywords-box" class="col s6"></div>
       </div>
     </div>
 
+
+
     <script type="text/javascript">
 
+    String.prototype.capitalizeFirstLetter = function() {
+      return this.charAt(0).toUpperCase() + this.slice(1);
+    }
 
-    function uploadFile(file, signedRequest, url){
-    const xhr = new XMLHttpRequest();
-    xhr.open('PUT', signedRequest);
+    var startRec = $('#start-recog')
+    var stopRec = $('#stop-recog')
+    var analyzeRec = $('#analyze-recog')
+    var saveRec = $('#save-recog')
+    var fullSpeech = ''
+    var results = {}
+    var speech = [];
+    var splitSpeech = [];
+
+    var recog = new p5.SpeechRec();
+    recog.continuous = true;
+    // recog.interimResults = true;
+    recog.onResult = showResult;
+    // recog.onResult = parseResult;
 
 
-    // the below code runs once a file has been added to the input field
-    xhr.onreadystatechange = () => {
-      var keywords = $('#keywords').val()
-      keywords = keywords.split(' ')
+    function showResult() {
+      speech.push(recog.resultString.toString());
+      fullSpeech = speech.join('. ')
+      console.log(fullSpeech);
+      $('#result-box').children().remove()
+      $('#result-box').append('<p>' + fullSpeech + '</p>')
+    }
 
-      if(xhr.readyState === 4){
-        if(xhr.status === 200){
-          document.getElementById('audio-file').value = url;
-          $('#submit-audio').parent().removeClass('disabled')
+    startRec.on('click', function() {
+      recog.start();
+      $('#input-div').addClass('hide')
+      analyzeRec.addClass('hide')
+      saveRec.addClass('hide')
+      stopRec.removeClass('hide')
+      // analyzeRec.addClass('disabled')
+    })
 
-          $.ajax({
-            url: "/transcribe?keyword=" + keywords,
-            method: "GET",
-          }).done(function(data){
-            $('#progress-bar').removeClass('progress')
-            data = JSON.parse(data)
-            keywordsResult = data.results[0].keywords_result;
-            resultSpeech = data.results[0].alternatives[0].transcript;
-            $('#result-box').append('<p>' + resultSpeech + '</p>')
 
-            for (var key in keywordsResult) {
-              $('#keywords-box').append('<li><span style="text-decoration: underline">' + keywordsResult[key][0].normalized_text + '</span>' + ' was repeated ' + keywordsResult[key].length + ' ' + (keywordsResult[key].length > 1 ? 'times</li>' : 'time</li>'))
-            }
+    stopRec.on('click', function() {
+      analyzeRec.removeClass('hide')
+      recog.stop();
+    })
+
+    analyzeRec.on('click', function(){
+      if (!fullSpeech) {
+        console.log("No speech detected");
+        $('#result-box').append('<h2>No speech to anaylze</h2>')
+      } else {
+      saveRec.removeClass('hide')
+        $('#result-box').children().remove()
+        $('#result-box').append('<p>' + fullSpeech + '</p>')
+        // fullSpeech = speech.join('. ')
+        splitSpeech = fullSpeech.split(" ")
+        for (i = 0; i < splitSpeech.length; i++) {
+          splitSpeech[i] = splitSpeech[i].replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"")
+          splitSpeech[i] = splitSpeech[i].replace("[^\\w]", "");
+        }
+        console.log(splitSpeech)
+        var keywords = $('#keywords').val()
+        console.log("Keywords in input:");
+        // console.log(keywords.filter(Boolean));
+        console.log(!!keywords);
+        if (keywords) {
+          keywords = keywords.split(' ')
+          keywords.forEach(function(keyword) {
+            results[keyword] = 0
+            splitSpeech.forEach(function(speechWord) {
+              if(speechWord == keyword) {
+                results[keyword] += 1
+              }
+            })
           })
-        }
-        else{
-          alert('Could not upload file.');
-        }
-      }
-    };
-    xhr.send(file);
-    }
-
-    function getSignedRequest(file){
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', `/sign-s3?file-name=${file.name}&file-type=${file.type}`);
-    xhr.onreadystatechange = () => {
-      if(xhr.readyState === 4){
-        if(xhr.status === 200){
-          const response = JSON.parse(xhr.responseText);
-          console.log(xhr.responseText);
-          uploadFile(file, response.signedRequest, response.url);
-        }
-        else{
-          alert('Could not get signed URL.');
+          for (var key in results) {
+            $('#keywords-box').append('<li><span style="text-decoration: underline">' + key + '</span> was repeated ' + results[key] + ' ' + (results[key] > 1 || results[key] == 0 ? 'times</li>' : 'time</li>'))
+          }
+        } else {
+          $('#keywords-box').append('<h2>No words to match</h2>')
         }
       }
-    };
-    xhr.send();
-    }
+    })
 
-    /*
-    Function called when file input updated. If there is a file selected, then
-    start upload procedure by asking for a signed request from the app.
-    */
-    function initUpload(){
-    $('#progress-bar').addClass('progress') // progress bar on upload start
-    const files = document.getElementById('file-input').files;
-    const file = files[0];
-    if(file == null){
-      return alert('No file selected.');
-    }
-    getSignedRequest(file);
-    }
-
-    /*
-    Bind listeners when the page loads.
-    */
-    (() => {
-      document.getElementById('file-input').onchange = initUpload;
-    })();
+    saveRec.on('click', function(){
+      var savedData = {}
+      savedData.speech = fullSpeech
+      savedData.results = results
+      console.log(savedData);
+      $.ajax({
+        url: ,
+        method: 'POST',
+        contentType: 'application/json',
+        data:JSON.stringify(savedData)
+      }).done(function(data) {
+        results = {}
+        fullSpeech = ''
+        splitSpeech = []
+        $('#keywords').val('')
+        $('#result-box').children().remove()
+        $('#keywords-box').children().remove()
+        $('#input-div').removeClass('hide')
+      })
+    })
 
     </script>
 

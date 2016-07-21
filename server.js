@@ -118,7 +118,7 @@ app.get('/transcribe', function(req, res) {
       word_alternatives_threshold: 0.01,
       continuous: true,
       keywords: [req.query.keyword],
-      keywords_threshold: 0.01
+      keywords_threshold: 0.001
     };
 
   speech_to_text.recognize(params2, function(error, transcript) {
