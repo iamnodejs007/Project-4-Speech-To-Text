@@ -65,7 +65,8 @@ Descriptions of any unsolved problems or major hurdles you had to overcome
 * Express.js
 * MongoDB
 * mLabs
-* p5.js
+* p5
+* p5 Speech
 * Passport
 
 
