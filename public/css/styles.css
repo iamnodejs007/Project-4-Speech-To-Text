@@ -34,9 +34,11 @@ html {
 
 .headline {
   font-family: 'Poiret One', cursive;
+  /*font-family: 'Quicksand', sans-serif;*/
+  font-weight: 400;
   color: white;
   background-color: rgba(0, 0, 0, .75);
-  margin-left: 200px;
+  margin-left: 300px;
   margin-right: 200px;
   border-radius: 5px;
   padding: 10px;
@@ -44,10 +46,22 @@ html {
 
 .headline-dark {
   font-family: 'Poiret One', cursive;
+  /*font-family: 'Quicksand', sans-serif;*/
+  font-weight: 300;
   color: white;
   background-color: rgba(0, 0, 0, .9);
   margin-left: 200px;
   margin-right: 200px;
   border-radius: 5px;
   padding: 10px;
+}
+
+.button-font {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 700;
+}
+
+.type-font {
+  font-family: 'Inconsolata';
+  font-weight: 400;
 }

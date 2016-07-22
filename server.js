@@ -21,9 +21,9 @@ var
 
 
 // mongoose server
-mongoose.connect('mongodb://localhost/project-4', function(err){
+mongoose.connect(process.env.DB_URL, function(err){
   if (err) return console.log(err);
-  console.log("Connected to MongoDB (Project-4)");
+  console.log("Connected to mLabs (text-to-speech)");
 })
 
 // middleware
