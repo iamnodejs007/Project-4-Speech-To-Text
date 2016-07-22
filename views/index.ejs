@@ -56,12 +56,16 @@
       </div>
     </div>
   </div>
-  <div class="container headline">
+  <div class="container">
     <h5 class="center-align type-font">Your saved speeches</h5>
     <div class="row">
       <div class="col s8 offset-s3">
-        <ul id="history" class="collection">
-        </ul>
+        <table id="history-table">
+          <thead>
+          </thead>
+          <tbody id="history-table-tbody">
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -70,14 +74,14 @@
 <div id="speech-modal" class="modal">
   <div class="modal-content">
     <h4>Speech</h4>
-    <p></p>
+    <p id="speech-text"></p>
   </div>
   <div class="modal-footer">
     <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat button-font">Close</a>
   </div>
 </div>
 
-<ul id='dropdown1' class='dropdown-content headline'>
+<ul id='dropdown1' class='dropdown-content headline button-font'>
   <li><a href="/profile">Profile</a></li>
   <li><a href="/logout">Logout</a></li>
 </ul>
@@ -101,7 +105,9 @@
     var results = {}
     var speech = [];
     var splitSpeech = [];
+    // var savedData = {}
     var keywordsTableBody = $('#keywords-table #keywords-table-tbody')
+    var historyTableBody = $('#history-table #history-table-tbody')
     var historyList = $('#history')
 
     var recog = new p5.SpeechRec();
@@ -188,13 +194,20 @@
       }).done(function(data) {
         console.log("this is the data");
         console.log(data);
+        savedData = {}
       })
     })
 
     clearRec.on('click', function() {
+
+      recog = new p5.SpeechRec()
+      recog.continuous = true;
+      recog.onResult = showResult;
       results = {}
       fullSpeech = ''
       splitSpeech = []
+      speech = []
+      // savedData = {}
       $('#keywords').val('')
       $('#result-box').children().remove()
       $('#keywords-box').children().remove()
@@ -207,7 +220,8 @@
     }).done(function(data) {
       for (var i =0; i < data.length; i ++) {
         if (data[i].posted_by == userId) {
-          historyList.append('<li class="collection-item"><button data-id="' + data[i]._id + '" class="delete waves-effect waves-light red btn button-font">Remove</button><a data-speech="' + data[i].speech + '" data-results="' + data[i].results + '" class="waves-effect waves-light btn modal-trigger button-font" href="#speech-modal">' + moment(data[i].createdAt).format('LLL') + '</a></li>')
+          // histortTableBody.append('<li style="background-color: black"class="collection-item"><button data-id="' + data[i]._id + '" class="delete waves-effect waves-light red btn button-font">Remove</button><a data-speech="' + data[i].speech + '" data-results="' + data[i].results + '" class="waves-effect waves-light btn modal-trigger button-font" href="#speech-modal">' + moment(data[i].createdAt).format('LLL') + '</a></li>')
+          historyTableBody.append('<tr><td><button data-id="' + data[i]._id + '" class="delete btn-floating btn-small waves-effect waves-light red button-font"><i class="material-icons right">delete</i></button>&nbsp&nbsp&nbsp&nbsp&nbsp<a data-speech="' + data[i].speech + '" data-results="' + data[i].results + '" class="waves-effect waves-light btn modal-trigger button-font" href="#speech-modal">' + moment(data[i].createdAt).format('LLL') + '</td></tr>')
         }
       }
     })
@@ -232,7 +246,8 @@
 
     $('body').on('click', 'a[data-speech]', function() {
       console.log($(this).data('speech'))
-      $('#speech-modal').text($(this).data('speech'))
+      $('#speech-text').text($(this).data('speech'))
+      $('#speech-modal').openModal();
     })
 
 
