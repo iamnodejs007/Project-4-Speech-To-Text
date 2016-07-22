@@ -11,3 +11,43 @@
   min-height: 200px;
   padding: 20px;
 }
+
+/*.container {
+  background-color: black;
+}*/
+
+.wrap {
+  /*background-color: rgba(255, 255, 255, 1);*/
+  margin: 0 100px 0 100px;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  /*border: 5px solid grey;*/
+}
+
+html {
+  background: url('https://pixabay.com/static/uploads/photo/2015/09/09/20/17/microphone-933057_960_720.jpg') no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.headline {
+  font-family: 'Poiret One', cursive;
+  color: white;
+  background-color: rgba(0, 0, 0, .75);
+  margin-left: 200px;
+  margin-right: 200px;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.headline-dark {
+  font-family: 'Poiret One', cursive;
+  color: white;
+  background-color: rgba(0, 0, 0, .9);
+  margin-left: 200px;
+  margin-right: 200px;
+  border-radius: 5px;
+  padding: 10px;
+}

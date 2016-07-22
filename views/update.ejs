@@ -1,0 +1,50 @@
+<!-- <div class="container">
+  <div class="row col-md-6 col-md-offset-3">
+    <h1><%= user.local.name %></h1>
+    <form action="<%= user._id %>" method="post">
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" class="form-control" name="local.name" value="<%= user.local.name %>">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="text" class="form-control" name="local.email" value="<%= user.local.email %>">
+      </div>
+      <input type="hidden" name="_method" value="PATCH">
+      <button type="submit" class="btn btn-warning btn-sm">Submit</button>
+      <a href="/profile" class="btn btn-default btn-sm">Cancel</a>
+    </form>
+  </div>
+</div> -->
+
+
+<div class="container">
+  <br><br><br>
+  <h5 class="center-align"><%= user.local.name %>, Edit account information below</h5>
+  <br>
+  <div class="row">
+    <form class="col s12 offset-s2" action="<%= user._id %>" method="post">
+      <div class="row">
+        <div class="input-field col s4 offset-s2">
+          <input type="text" name="local.name" value="<%= user.local.name %>">
+          <label for="name">Name</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s4 offset-s2">
+          <input type="text" name="local.email" value="<%= user.local.email %>">
+          <label for="email">Email</label>
+        </div>
+      </div>
+      <input type="hidden" name="_method" value="PATCH">
+      <button type="submit" class="waves-effect waves-light btn col s4 offset-s2">Save Edits</button>
+    </form>
+    <div class="col s12 offset-s2">
+      <div class="row">
+        <div class="input-field col s4 offset-s2">
+          <a class="waves-effect waves-light btn-large blue" href="/profile">Cancel</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

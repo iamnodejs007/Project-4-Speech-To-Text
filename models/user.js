@@ -1,20 +1,16 @@
 var
   mongoose = require('mongoose'),
-  findOrCreate = require('mongoose-findorcreate')
+  findOrCreate = require('mongoose-findorcreate'),
   bcrypt = require('bcrypt-nodejs'),
   Schema = mongoose.Schema,
-  speechSchema = new Schema({
-  text: String,
-  keywords: Object
-  })
   User = new Schema({
     local: {
       name: String,
       email: String,
-      username: String,
-      password: String,
-    },
-    speeches: [speechSchema]
+      password: String
+    }},
+    {
+      timestamps: true
   })
 
   User.plugin(findOrCreate)

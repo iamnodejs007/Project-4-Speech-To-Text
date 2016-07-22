@@ -1,23 +1,93 @@
-    <br><br><br>
+<script src="/js/moment.js" type="text/javascript"></script>
+
+<div class="index-page headline">
+  <div class="center-align">
+    <h1 class="center-align dropdown-button btn-flat" data-activates='dropdown1'><i class="material-icons right">reorder</i>Welcome <%= user.local.name %></h1>
+  </div>
+
+    <br>
+  <div class="wrap">
     <div class="container">
-      <div class="row">
-        <div class="col s12">
-          <button class="waves-effect waves-light btn" id="start-recog" type="button" name="button">Start Recording</button>
-          <button class="waves-effect red btn hide" id="stop-recog" type="button" name="button">Pause Recording</button>
-          <button class="waves-effect red btn hide" id="analyze-recog" type="button" name="button">Analyze Recording</button>
-          <button class="waves-effect red btn hide" id="save-recog" type="button" name="button">Save Recording</button>
-          <div id="input-div" class="input-field">
-            <input id="keywords" type="text" name="name" placeholder="Keywords">
-          </div>
-          <div id="result-box" class="col s6"></div>
-          <div id="keywords-box" class="col s6"></div>
+      <div class="col s12">
+        <div class="row">
+        <div class="col s3">
+          <button class="waves-effect waves-light btn-large red" id="start-recog" type="button" name="button"><i class="material-icons right">mic</i>Start Recording</button>
+        </div>
+        <div class="col s3">
+          <button class="waves-effect waves-light btn-large blue hide" id="stop-recog" type="button" name="button"><i class="material-icons right">pause</i>Pause Recording</button>
+        </div>
+        <div class="col s3">
+          <button class="waves-effect waves-light btn-large blue hide" id="save-recog" type="button" name="button"><i class="material-icons right">playlist_add</i>Save Recording</button>
+        </div>
+        <div class="col s3">
+          <button class="waves-effect waves-light btn-large green hide" id="clear-recog" type="button" name="button"><i class="material-icons right">clear_all</i>Clear Recording</button>
         </div>
       </div>
     </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col s12">
+          <div id="input-div" class="input-field">
+            <input id="keywords" type="text" name="name" placeholder="Keywords to listen for">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="col s12">
+        <div id="result-box"></div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="col s12">
+        <div id="keywords-box">
+          <table id="keywords-table">
+            <thead>
+              <!-- <tr>Analysis</tr> -->
+              <tr>
+                  <th data-field="id"><h5>How many times were the keywords repeated?</h5></th>
+              </tr>
+            </thead>
+            <tbody id="keywords-table-tbody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container headline">
+    <h5 class="center-align">Your saved speeches</h5>
+    <div class="row">
+      <div class="col s6 offset-s3">
+        <ul id="history" class="collection">
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
 
+<div id="speech-modal" class="modal">
+  <div class="modal-content">
+    <h4>Speech text:</h4>
+    <p id="speech-text"></p>
+  </div>
+  <div class="modal-footer">
+    <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+  </div>
+</div>
+
+<ul id='dropdown1' class='dropdown-content headline'>
+  <li><a href="/profile">Profile</a></li>
+  <li><a href="/logout">Logout</a></li>
+</ul>
+
+<div id="user-id" data-userid="<%= user._id %>"></div>
 
 
     <script type="text/javascript">
+
+    var userId = $('#user-id').data('userid')
 
     String.prototype.capitalizeFirstLetter = function() {
       return this.charAt(0).toUpperCase() + this.slice(1);
@@ -25,12 +95,14 @@
 
     var startRec = $('#start-recog')
     var stopRec = $('#stop-recog')
-    var analyzeRec = $('#analyze-recog')
+    var clearRec = $('#clear-recog')
     var saveRec = $('#save-recog')
     var fullSpeech = ''
     var results = {}
     var speech = [];
     var splitSpeech = [];
+    var keywordsTableBody = $('#keywords-table #keywords-table-tbody')
+    var historyList = $('#history')
 
     var recog = new p5.SpeechRec();
     recog.continuous = true;
@@ -45,81 +117,125 @@
       console.log(fullSpeech);
       $('#result-box').children().remove()
       $('#result-box').append('<p>' + fullSpeech + '</p>')
+      analyze()
     }
 
     startRec.on('click', function() {
       recog.start();
       $('#input-div').addClass('hide')
-      analyzeRec.addClass('hide')
       saveRec.addClass('hide')
+      // saveRec.addClass('hide')
       stopRec.removeClass('hide')
       // analyzeRec.addClass('disabled')
     })
 
 
     stopRec.on('click', function() {
-      analyzeRec.removeClass('hide')
+      saveRec.removeClass('hide')
       recog.stop();
     })
 
-    analyzeRec.on('click', function(){
+    function analyze() {
       if (!fullSpeech) {
         console.log("No speech detected");
-        $('#result-box').append('<h2>No speech to anaylze</h2>')
+        $('#result-box').append('<h3 class="center-align">No speech to anaylze</h3>')
       } else {
-      saveRec.removeClass('hide')
-        $('#result-box').children().remove()
-        $('#result-box').append('<p>' + fullSpeech + '</p>')
-        // fullSpeech = speech.join('. ')
-        splitSpeech = fullSpeech.split(" ")
-        for (i = 0; i < splitSpeech.length; i++) {
-          splitSpeech[i] = splitSpeech[i].replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"")
-          splitSpeech[i] = splitSpeech[i].replace("[^\\w]", "");
-        }
-        console.log(splitSpeech)
-        var keywords = $('#keywords').val()
-        console.log("Keywords in input:");
-        // console.log(keywords.filter(Boolean));
-        console.log(!!keywords);
-        if (keywords) {
-          keywords = keywords.split(' ')
-          keywords.forEach(function(keyword) {
-            results[keyword] = 0
-            splitSpeech.forEach(function(speechWord) {
-              if(speechWord == keyword) {
-                results[keyword] += 1
-              }
-            })
+
+      $('#result-box').children().remove()
+      $('#result-box').append('<p>' + fullSpeech + '</p>')
+      // fullSpeech = speech.join('. ')
+      splitSpeech = fullSpeech.split(" ")
+      for (i = 0; i < splitSpeech.length; i++) {
+        splitSpeech[i] = splitSpeech[i].replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"")
+        splitSpeech[i] = splitSpeech[i].replace("[^\\w]", "");
+      }
+      console.log(splitSpeech)
+      var keywords = $('#keywords').val()
+      console.log("Keywords in input:");
+      // console.log(keywords.filter(Boolean));
+      console.log(!!keywords);
+      if (keywords) {
+        keywords = keywords.split(' ').filter(Boolean)
+        keywords.forEach(function(keyword) {
+          results[keyword] = 0
+          splitSpeech.forEach(function(speechWord) {
+            if(speechWord == keyword) {
+              results[keyword] += 1
+            }
           })
-          for (var key in results) {
-            $('#keywords-box').append('<li><span style="text-decoration: underline">' + key + '</span> was repeated ' + results[key] + ' ' + (results[key] > 1 || results[key] == 0 ? 'times</li>' : 'time</li>'))
-          }
+        })
+        for (var key in results) {
+          keywordsTableBody.append('<tr><td><span style="text-decoration: underline">' + key + '</span> was repeated ' + results[key] + ' ' + (results[key] > 1 || results[key] == 0 ? 'times</td></tr>' : 'time</td></tr>'))
+        }
         } else {
-          $('#keywords-box').append('<h2>No words to match</h2>')
+          $('#keywords-box').append('<h3 class="center-align">No words to match</h3>')
         }
       }
-    })
+    }
+
+    // analyzeRec.on('click', analyze)
 
     saveRec.on('click', function(){
+      clearRec.removeClass('hide')
       var savedData = {}
       savedData.speech = fullSpeech
       savedData.results = results
       console.log(savedData);
       $.ajax({
-        url: ,
+        url: '/speeches',
         method: 'POST',
         contentType: 'application/json',
-        data:JSON.stringify(savedData)
+        data: JSON.stringify(savedData)
       }).done(function(data) {
-        results = {}
-        fullSpeech = ''
-        splitSpeech = []
-        $('#keywords').val('')
-        $('#result-box').children().remove()
-        $('#keywords-box').children().remove()
-        $('#input-div').removeClass('hide')
+        console.log("this is the data");
+        console.log(data);
       })
     })
+
+    clearRec.on('click', function() {
+      results = {}
+      fullSpeech = ''
+      splitSpeech = []
+      $('#keywords').val('')
+      $('#result-box').children().remove()
+      $('#keywords-box').children().remove()
+      $('#input-div').removeClass('hide')
+    })
+
+    $.ajax({
+      url: '/speeches',
+      method: 'GET'
+    }).done(function(data) {
+      for (var i =0; i < data.length; i ++) {
+        if (data[i].posted_by == userId) {
+          historyList.append('<li class="collection-item"><button data-id="' + data[i]._id + '" class="delete waves-effect waves-light red btn">Remove</button><a data-speech="' + data[i].speech + '" data-results="' + data[i].results + '" class="waves-effect waves-light btn modal-trigger" href="#speech-modal">' + moment(data[i].createdAt).format('LLL') + '</a></li>')
+        }
+      }
+    })
+
+    $(document).ready(function(){
+      // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+      $('.modal-trigger').leanModal();
+    });
+
+    $('body').on('click', '.delete', function() {
+      var btn = $(this)
+      var itemId = btn.data('id')
+      $.ajax({
+        url: '/speeches/' + itemId,
+        method: 'DELETE'
+      }).done(function(data) {
+        btn.parent().slideUp(function(){
+          btn.parent().remove()
+        })
+      })
+    })
+
+    $('body').on('click', 'a[data-speech]', function() {
+      console.log($(this).data('speech'))
+      $('#speech-modal #speech-text').text($(this).data('speech'))
+    })
+
 
     </script>
 
