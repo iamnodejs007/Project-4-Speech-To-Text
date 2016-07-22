@@ -73,7 +73,7 @@ Descriptions of any unsolved problems or major hurdles you had to overcome
 
 1. IBM Watson Speech-to-text configuration
 2. Passport
-3. 
+3. DOM manipulation 
 
 ### Future Implementations
 
