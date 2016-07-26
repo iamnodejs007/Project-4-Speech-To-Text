@@ -15,9 +15,8 @@ var
   port = process.env.PORT || 3000,
   passportConfig = require('./config/passport.js'),
   userRoutes = require('./routes/users.js'),
-  speechRoutes = require('./routes/speeches.js'),
-  User = require('./models/User.js'),
-  Speech = require('./models/Speech.js')
+  speechRoutes = require('./routes/speeches.js')
+
 
 
 // mongoose server
