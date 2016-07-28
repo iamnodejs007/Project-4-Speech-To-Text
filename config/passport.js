@@ -1,7 +1,7 @@
 var
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
-	User = require('../models/User.js')
+	User = require('../models/user.js')
 
 passport.serializeUser(function(user, done){
   //create cookie
