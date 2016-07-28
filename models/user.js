@@ -3,7 +3,7 @@ var
   findOrCreate = require('mongoose-findorcreate'),
   bcrypt = require('bcrypt-nodejs'),
   Schema = mongoose.Schema,
-  User = new Schema({
+  userSchema = new Schema({
     local: {
       name: String,
       email: String,
@@ -13,18 +13,18 @@ var
       timestamps: true
   })
 
-  User.plugin(findOrCreate)
+  userSchema.plugin(findOrCreate)
 
-  User.methods.generateHash = function(password){
+  userSchema.methods.generateHash = function(password){
     return bcrypt.hashSync(password, bcrypt.genSaltSync(8))
     //hashSync prevent other shits running before this happens
   }
 
-  User.methods.validPassword = function(password){
+  userSchema.methods.validPassword = function(password){
     return bcrypt.compareSync(password, this.local.password)
     //compareSync
   }
 
-var User = mongoose.model('User', User)
+var User = mongoose.model('User', userSchema)
 
 module.exports = User
