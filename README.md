@@ -58,7 +58,7 @@ Descriptions of any unsolved problems or major hurdles you had to overcome
 ### Technologies/Frameworks used
 
 * HTML5
-* CSS
+* CSS3
 * Javascript
 * jQuery
 * EJS
@@ -67,8 +67,8 @@ Descriptions of any unsolved problems or major hurdles you had to overcome
 * Express.js
 * MongoDB
 * mLabs
-* p5
-* p5 Speech
+* p5.js
+* p5.speech
 * Passport
 
 
