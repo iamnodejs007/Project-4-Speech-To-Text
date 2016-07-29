@@ -1,4 +1,4 @@
-# WDI Project 4: Text-to-Speech
+# WDI Project 4: Speech-To-Text
 
 
 ![](./public/images/screenshot.png)
