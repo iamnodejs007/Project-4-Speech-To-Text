@@ -3,8 +3,6 @@
 
 ![](./public/images/screenshot.png)
 
-https://text-to-speech.herokuapp.com/
-
 ### Objective
 
 Create a web application that will help you improve your public speaking skills by telling how many times you say/repeat certain words, such as "like" and "um, in your speech. ("um" does not work, yet)
@@ -83,3 +81,4 @@ Descriptions of any unsolved problems or major hurdles you had to overcome
 * Improve CSS styling
 * Add ability to upload an audio file to be transcribed
 * Fix minor bugs
+* Fix speech recognition on Heroku
