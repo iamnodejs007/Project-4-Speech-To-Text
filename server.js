@@ -15,7 +15,9 @@ var
   port = process.env.PORT || 3000,
   passportConfig = require('./config/passport.js'),
   userRoutes = require('./routes/users.js'),
-  speechRoutes = require('./routes/speeches.js')
+  speechRoutes = require('./routes/speeches.js'),
+  nodemailer = require('nodemailer'),
+  smtpTransport = require('nodemailer-smtp-transport')
 
 
 
@@ -24,6 +26,7 @@ mongoose.connect(process.env.DB_URL, function(err){
   if (err) return console.log(err);
   console.log("Connected to mLabs (text-to-speech)");
 })
+
 
 // middleware
 app.use(express.static('./public'))
@@ -40,10 +43,40 @@ app.use(methodOverride(function(req, res){
   }
 }))
 
+
+// // NODEMAILER setup using gmail
+// var transporter = nodemailer.createTransport({
+//     service: 'gmail',
+//     auth: {
+//         user: process.env.EMAIL,
+//         pass: process.env.EMAIL_PASSWORD
+//     },
+//     secure: true
+// });
+//
+// // setup e-mail data with unicode symbols
+// var mailOptions = {
+//   from: "Lawrence Gomez <" + process.env.EMAIL + ">", // sender address.  Must be the same as authenticated user if using Gmail.
+//   to: "Lawrence Gomez <lawrence.gomez@outlook.com>", // receiver
+//   subject: "Test email with nodemailer", // subject
+//   text: "Sup dude!", // body
+//   html: '<b>Sup Dude!</b>' // html body
+// };
+//
+// // send mail with defined transport object
+// transporter.sendMail(mailOptions, function(error, info){
+//     if(error){
+//         return console.log(error);
+//     }
+//     console.log('Message sent: ' + info.response);
+// });
+
+
 // ejs configuration
 app.set('view engine', 'ejs')
 app.use(ejsLayouts)
 app.use(flash())
+
 
 // this is the session and passport middleware
 app.use(session({

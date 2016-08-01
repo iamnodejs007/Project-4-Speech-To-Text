@@ -92,10 +92,6 @@
 
     var userId = $('#user-id').data('userid')
 
-    String.prototype.capitalizeFirstLetter = function() {
-      return this.charAt(0).toUpperCase() + this.slice(1);
-    }
-
     var startRec = $('#start-recog')
     var stopRec = $('#stop-recog')
     var clearRec = $('#clear-recog')
@@ -108,6 +104,7 @@
     var keywordsTableBody = $('#keywords-table #keywords-table-tbody')
     var historyTableBody = $('#history-table #history-table-tbody')
     var historyList = $('#history')
+    var keywordsResultArray;
 
     var recog = new p5.SpeechRec();
     recog.continuous = true;
@@ -132,6 +129,7 @@
       // saveRec.addClass('hide')
       stopRec.removeClass('hide')
       // analyzeRec.addClass('disabled')
+      clearKeywordsBox()
     })
 
 
@@ -177,6 +175,14 @@
       }
     }
 
+    // function to clear the keywords result box when the clear button is clicked or the speech is continued.
+    function clearKeywordsBox() {
+      keywordsResultArray = $("#keywords-box").children().children().children().children()
+      for (var i = 1; i < keywordsResultArray.length; i++) {
+        keywordsResultArray[i].remove()
+      }
+    }
+
     // analyzeRec.on('click', analyze)
 
     saveRec.on('click', function(){
@@ -184,21 +190,18 @@
       var savedData = {}
       savedData.speech = fullSpeech
       savedData.results = results
-      console.log(savedData);
       $.ajax({
         url: '/speeches',
         method: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(savedData)
       }).done(function(data) {
-        console.log("this is the data");
-        console.log(data);
+        historyTableBody.append('<tr><td><button data-id="' + data._id + '" class="delete btn-floating btn-small waves-effect waves-light red button-font"><i class="material-icons right">delete</i></button>&nbsp&nbsp&nbsp&nbsp&nbsp<a data-speech="' + data.speech.speech + '" data-results="' + data.speech.results + '" class="waves-effect waves-light btn modal-trigger button-font" href="#speech-modal">' + moment(data.speech.createdAt).format('LLL') + '</td></tr>')
         savedData = {}
       })
     })
 
     clearRec.on('click', function() {
-
       recog = new p5.SpeechRec()
       recog.continuous = true;
       recog.onResult = showResult;
@@ -209,8 +212,8 @@
       // savedData = {}
       $('#keywords').val('')
       $('#result-box').children().remove()
-      $('#keywords-box').children().children().children().children().children().children().children().remove()
       $('#input-div').removeClass('hide')
+      clearKeywordsBox()
     })
 
     $.ajax({
@@ -219,7 +222,7 @@
     }).done(function(data) {
       for (var i =0; i < data.length; i ++) {
         if (data[i].posted_by == userId) {
-          // histortTableBody.append('<li style="background-color: black"class="collection-item"><button data-id="' + data[i]._id + '" class="delete waves-effect waves-light red btn button-font">Remove</button><a data-speech="' + data[i].speech + '" data-results="' + data[i].results + '" class="waves-effect waves-light btn modal-trigger button-font" href="#speech-modal">' + moment(data[i].createdAt).format('LLL') + '</a></li>')
+          console.log(data[i].results);
           historyTableBody.append('<tr><td><button data-id="' + data[i]._id + '" class="delete btn-floating btn-small waves-effect waves-light red button-font"><i class="material-icons right">delete</i></button>&nbsp&nbsp&nbsp&nbsp&nbsp<a data-speech="' + data[i].speech + '" data-results="' + data[i].results + '" class="waves-effect waves-light btn modal-trigger button-font" href="#speech-modal">' + moment(data[i].createdAt).format('LLL') + '</td></tr>')
         }
       }
@@ -244,7 +247,11 @@
     })
 
     $('body').on('click', 'a[data-speech]', function() {
-      console.log($(this).data('speech'))
+      console.log($(this).data('results'))
+      var object = $(this).data('results')
+      // for (var key in object) {
+      //   console.log(object[key]);
+      // }
       $('#speech-text').text($(this).data('speech'))
       $('#speech-modal').openModal();
     })
