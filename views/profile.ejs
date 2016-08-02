@@ -1,23 +1,32 @@
 <script src="/js/moment.js" type="text/javascript"></script>
 <br><br> <br>
 <div class="container headline">
-    <div class="row">
-      <div class="col s4 offset-s3">
-          <h3>Profile Information</h3><br>
-          <h5>Name: <%= user.local.name %></h5><br>
-          <h5>Email: <%= user.local.email %></h5><br>
-          <h5 id="user-since"></h5>
-      </div>
-<br><br><br><br>
-      <div class="col s2 center-align">
-        <a class="waves-effect waves-light btn-large green" href="/user/<%= user._id %>">Edit</a><br><br>
-        <a class="waves-effect waves-light btn-large blue" href="/logout">Logout</a><br><br>
-        <a class="waves-effect waves-light btn-large blue" href="/main">Home Page</a><br><br>
-        <a class="waves-effect waves-light btn-large red" id="delete-account" href="/user/<%= user._id %>/delete">Delete Account</a>
-      </div>
-
+  <div class="row">
+    <div class="col s4 offset-s3">
+        <h3>Profile Information</h3><br>
+        <h5>Name: <%= user.local.name %></h5><br>
+        <h5>Email: <%= user.local.email %></h5><br>
+        <h5 id="user-since"></h5>
+    </div>
+  </div>
+    <br>
+  <div class="row">
+    <div class="col s2 offset-s2">
+      <a class="waves-effect waves-light btn-large green" href="/user/<%= user._id %>">Edit</a>
+    </div>
+    <div class="col s2">
+      <a class="waves-effect waves-light btn-large blue" href="/logout">Logout</a>
+    </div>
+    <div class="col s2">
+      <a class="waves-effect waves-light btn-large gray" href="/main">Home Page</a>
+    </div>
+    <div class="col s2">
+      <a class="waves-effect waves-light btn-large red" id="delete-account" href="/user/<%= user._id %>/delete">Delete Account</a>
+    </div>
   </div>
 </div>
+
+
 
 
 
