@@ -2,6 +2,9 @@
 <div class="container headline-dark">
   <br>
   <h5 class="center-align">Enter login information below</h5>
+  <% if(flash) { %>
+  <div class="center-align" style="color: red"><%= flash %></div>
+  <% } %>
   <br>
   <div class="row">
     <form class="col s8 offset-s4" action="/login" method="post">

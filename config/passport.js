@@ -40,7 +40,7 @@ passport.use('local-signup', new LocalStrategy({
   User.findOne({'local.email': email}, function(err, user){
     //looking for user's email within the local email
     if(err) return done(err)
-    if(user) return done(null, false, req.flash('signupmessage', 'That email is taken.'))
+    if(user) return done(null, false, req.flash('signupMessage', 'A user with that email already exists.'))
     var newUser = new User()
     newUser.local.name = req.body.name
     newUser.local.email = email
@@ -72,8 +72,8 @@ passport.use('local-login', new LocalStrategy({
 }, function(req, email, password, done){
   User.findOne({'local.email': email}, function(err, user){
     if(err) return done(err)
-    if(!user) return done(null, false, req.flash('loginMessage', 'No user found...'))
-    if(!user.validPassword(password)) return done(null, false, req.flash('loginMessage', 'Wrong password...'))
+    if(!user) return done(null, false, req.flash('loginMessage', 'No user by that email exists'))
+    if(!user.validPassword(password)) return done(null, false, req.flash('loginMessage', 'Incorrect password'))
     return done(null, user)
   })
 }))

@@ -2,6 +2,9 @@
 <div class="container headline-dark">
   <br><br><br>
   <h5 class="center-align">Enter the following information to create an account</h5>
+  <% if(flash) { %>
+  <div class="center-align" style="color: red"><%= flash %></div>
+  <% } %>
   <br>
   <div class="row">
     <form class="col s12 offset-s2" action="signup" method="post">

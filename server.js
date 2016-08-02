@@ -15,9 +15,9 @@ var
   port = process.env.PORT || 3000,
   passportConfig = require('./config/passport.js'),
   userRoutes = require('./routes/users.js'),
-  speechRoutes = require('./routes/speeches.js'),
-  nodemailer = require('nodemailer'),
-  smtpTransport = require('nodemailer-smtp-transport')
+  speechRoutes = require('./routes/speeches.js')
+  // nodemailer = require('nodemailer'),
+  // smtpTransport = require('nodemailer-smtp-transport')
 
 
 
@@ -75,7 +75,6 @@ app.use(methodOverride(function(req, res){
 // ejs configuration
 app.set('view engine', 'ejs')
 app.use(ejsLayouts)
-app.use(flash())
 
 
 // this is the session and passport middleware
@@ -87,6 +86,7 @@ app.use(session({
 }))
 app.use(passport.initialize())
 app.use(passport.session()) // this is what allows the cookie to get created, when necessary
+app.use(flash())
 
 app.use(function(req, res, next) {
   res.locals.user = req.user
