@@ -1,32 +1,25 @@
 <br><br><br><br>
 <div class="container headline-dark">
   <br>
-  <h5 class="center-align">Enter login information below</h5>
+  <h5 class="center-align">Enter the email you used to sign up for your account</h5>
+  <br>
   <% if(flash) { %>
   <div class="center-align" style="color: red"><%= flash %></div>
   <% } %>
-  <br>
   <div class="row">
-    <form class="col s8 offset-s4" action="/login" method="post">
+    <form class="col s8 offset-s4" action="/forgot" method="post">
       <div class="row">
         <div class="input-field col s6">
           <input type="text" name="email">
           <label>Email</label>
         </div>
       </div>
-      <div class="row">
-        <div class="input-field col s6">
-          <input type="password" name="password">
-          <label>Password</label>
-        </div>
-      </div>
-      <button type="submit" class="waves-effect waves-light btn">Login</button>
+      <button type="submit" class="waves-effect waves-light btn">Reset Password</button>
     </form>
     <div class="col s8 offset-s4">
       <div class="row">
         <div class="input-field col s8">
-          <p>Go back <a href="/">home</a>, or</p><br>
-          <p><a href="/forgot">Forgot your password</a></p>
+          <p>Go back <a href="/">home</a>.</p>
         </div>
       </div>
     </div>

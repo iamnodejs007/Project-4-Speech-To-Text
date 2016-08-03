@@ -15,7 +15,9 @@ var
   port = process.env.PORT || 3000,
   passportConfig = require('./config/passport.js'),
   userRoutes = require('./routes/users.js'),
-  speechRoutes = require('./routes/speeches.js')
+  speechRoutes = require('./routes/speeches.js'),
+  aSync = require('async'),
+  crypto = require('crypto');
   // nodemailer = require('nodemailer'),
   // smtpTransport = require('nodemailer-smtp-transport')
 
