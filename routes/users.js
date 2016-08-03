@@ -72,7 +72,7 @@ userRouter.route('/forgot')
       var mailOptions = {
         from: "Password Reset <" + process.env.EMAIL + ">",
         to: user.local.name + "<" + user.local.email + ">",
-        subject: 'Speech-To-Text Password Reset',
+        subject: 'Password Reset',
         html: '<p>You are receiving this email because you (or someone else) has requested to reset your password for your account.</p><br>' +
         '<p>Please open the following link to reset your password</p><br>' + req.headers.host + '/reset/' + token + '<br><br>If you did not request this, disregard this email.',
         text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
@@ -106,7 +106,6 @@ userRouter.route('/reset/:token')
     aSync.waterfall([
      function(done) {
        User.findOne({'local.resetPasswordToken': req.params.token, 'local.resetPasswordExpires': { $gt: Date.now() } }, function(err, user) {
-         console.log(user);
          if (!user) {
            req.flash('error', 'Password reset token is invalid or has expired.');
            res.render('reset');
@@ -136,7 +135,7 @@ userRouter.route('/reset/:token')
      });
    }
    ], function(err) {
-     res.redirect('/');
+     res.redirect('/login');
    });
   })
 
