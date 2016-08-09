@@ -70,13 +70,20 @@
   </div>
 </div>
 
+<div id="results-storage" style="display:none">
+  <ul id="results-list">
+  </ul>
+</div>
+
 <div id="speech-modal" class="modal">
   <div class="modal-content">
-    <h4>Speech</h4>
-    <p id="speech-text"></p>
+    <h5>Speech:</h5>
+    <p id="speech-text"></p><br>
+    <h5>Repeated Words:</h5>
+    <p id="speech-results"></p>
   </div>
   <div class="modal-footer">
-    <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat button-font">Close</a>
+    <a href="#!" class="close-modal modal-action modal-close waves-effect waves-green btn-flat button-font">Close</a>
   </div>
 </div>
 
@@ -104,6 +111,8 @@
     var keywordsTableBody = $('#keywords-table #keywords-table-tbody')
     var historyTableBody = $('#history-table #history-table-tbody')
     var historyList = $('#history')
+    var resultsStorage = $('#results-storage')
+    var resultsList = $("#results-storage #results-list")
     var keywordsResultArray;
 
     var recog = new p5.SpeechRec();
@@ -116,7 +125,6 @@
     function showResult() {
       speech.push(recog.resultString.toString());
       fullSpeech = speech.join('. ')
-      console.log(fullSpeech);
       $('#result-box').children().remove()
       $('#result-box').append('<p class="type-font">' + fullSpeech + '</p>')
       analyze()
@@ -196,7 +204,16 @@
         contentType: 'application/json',
         data: JSON.stringify(savedData)
       }).done(function(data) {
-        historyTableBody.append('<tr><td><button data-id="' + data._id + '" class="delete btn-floating btn-small waves-effect waves-light red button-font"><i class="material-icons right">delete</i></button>&nbsp&nbsp&nbsp&nbsp&nbsp<a data-speech="' + data.speech.speech + '" data-results="' + data.speech.results + '" class="waves-effect waves-light btn modal-trigger button-font" href="#speech-modal">' + moment(data.speech.createdAt).format('LLL') + '</td></tr>')
+        console.log("hello");
+        console.log(data.speech.results);
+        console.log("hello");
+
+        var resultsObject = data.speech.results
+
+        historyTableBody.append('<tr><td><div class="speech-results" style="display:none"></div><button data-id="' + data._id + '" class="delete btn-floating btn-small waves-effect waves-light red button-font"><i class="material-icons right">delete</i></button>&nbsp&nbsp&nbsp&nbsp&nbsp<a data-speech="' + data.speech.speech + '" class="waves-effect waves-light btn modal-trigger button-font" href="#speech-modal">' + moment(data.speech.createdAt).format('LLL') + '</td></tr>')
+        for (var key in resultsObject) {
+          $('.speech-results').last().append('<p>' + key + ' : ' + resultsObject[key] + ',</p>')
+        }
         savedData = {}
       })
     })
@@ -220,11 +237,15 @@
       url: '/speeches',
       method: 'GET'
     }).done(function(data) {
-      for (var i =0; i < data.length; i ++) {
+      for (var i = 0; i < data.length; i ++) {
         if (data[i].posted_by == userId) {
-          console.log(data[i].results);
-          historyTableBody.append('<tr><td><button data-id="' + data[i]._id + '" class="delete btn-floating btn-small waves-effect waves-light red button-font"><i class="material-icons right">delete</i></button>&nbsp&nbsp&nbsp&nbsp&nbsp<a data-speech="' + data[i].speech + '" data-results="' + data[i].results + '" class="waves-effect waves-light btn modal-trigger button-font" href="#speech-modal">' + moment(data[i].createdAt).format('LLL') + '</td></tr>')
+          var resultsObject = data[i].results
+          historyTableBody.append('<tr><td><div class="speech-results" style="display:none"></div><button data-id="' + data[i]._id + '" class="delete btn-floating btn-small waves-effect waves-light red button-font"><i class="material-icons right">delete</i></button>&nbsp&nbsp&nbsp&nbsp&nbsp<a data-speech="' + data[i].speech + '" class="waves-effect waves-light btn modal-trigger button-font" href="#speech-modal">' + moment(data[i].createdAt).format('LLL') + '</td></tr>')
         }
+        for (var key in resultsObject) {
+          $('.speech-results').last().append('<p>' + key + ' : ' + resultsObject[key] + ',</p>')
+        }
+        resultsObject = {}
       }
     })
 
@@ -247,13 +268,17 @@
     })
 
     $('body').on('click', 'a[data-speech]', function() {
-      console.log($(this).data('results'))
-      var object = $(this).data('results')
-      // for (var key in object) {
-      //   console.log(object[key]);
-      // }
       $('#speech-text').text($(this).data('speech'))
+      var resultsText = $(this).prev().prev().text()
+      var splitText = resultsText.split(/\s*,\s*/) // splits the text into an array spearated by commas (which i put in to use as a separator later)
+      splitText.forEach(function(el){ // loop through the array and then append a paragraph element for each
+        $('#speech-results').append('<p>' + el + '</p>')
+      })
       $('#speech-modal').openModal();
+    })
+
+    $('.close-modal').on('click', function() {
+      $('#speech-results').children().remove()
     })
 
 

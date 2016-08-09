@@ -87,7 +87,6 @@ userRouter.route('/forgot')
     }
   ], function(error) {
     if (error) return next(error);
-    console.log("made it to the end");
     res.redirect('/forgot');
   });
 });

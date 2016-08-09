@@ -18,8 +18,6 @@ var
   speechRoutes = require('./routes/speeches.js'),
   aSync = require('async'),
   crypto = require('crypto');
-  // nodemailer = require('nodemailer'),
-  // smtpTransport = require('nodemailer-smtp-transport')
 
 
 
@@ -44,34 +42,6 @@ app.use(methodOverride(function(req, res){
     return method
   }
 }))
-
-
-// // NODEMAILER setup using gmail
-// var transporter = nodemailer.createTransport({
-//     service: 'gmail',
-//     auth: {
-//         user: process.env.EMAIL,
-//         pass: process.env.EMAIL_PASSWORD
-//     },
-//     secure: true
-// });
-//
-// // setup e-mail data with unicode symbols
-// var mailOptions = {
-//   from: "Lawrence Gomez <" + process.env.EMAIL + ">", // sender address.  Must be the same as authenticated user if using Gmail.
-//   to: "Lawrence Gomez <lawrence.gomez@outlook.com>", // receiver
-//   subject: "Test email with nodemailer", // subject
-//   text: "Sup dude!", // body
-//   html: '<b>Sup Dude!</b>' // html body
-// };
-//
-// // send mail with defined transport object
-// transporter.sendMail(mailOptions, function(error, info){
-//     if(error){
-//         return console.log(error);
-//     }
-//     console.log('Message sent: ' + info.response);
-// });
 
 
 // ejs configuration

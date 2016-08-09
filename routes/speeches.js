@@ -20,6 +20,9 @@ speechRouter.route('/speeches')
       Speech.populate(speech, {path:"posted_by"}, function(err, speech){
         if (err) return console.log(err);
       })
+      console.log("hello");
+      console.log(speech);
+      console.log("hello");
       res.json({serverSays: "Speech successfully created", speech: speech})
     })
   })
