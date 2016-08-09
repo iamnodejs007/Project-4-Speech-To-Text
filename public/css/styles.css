@@ -25,7 +25,7 @@
 }
 
 html {
-  background: url('https://pixabay.com/static/uploads/photo/2015/09/09/20/17/microphone-933057_960_720.jpg') no-repeat center center fixed;
+  background: url(../images/microphone.jpeg) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
