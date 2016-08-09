@@ -3,8 +3,14 @@
   <br>
   <h5 class="center-align">Enter the email you used to sign up for your account</h5>
   <br>
-  <% if(flash) { %>
-  <div class="center-align" style="color: red"><%= flash %></div>
+  <% if(messages.error) { %>
+  <div class="center-align" style="color: white"><%= messages.error %></div>
+  <% } %>
+  <% if(messages.info) { %>
+  <div class="center-align" style="color: white"><%= messages.info %></div>
+  <% } %>
+  <% if(messages.success) { %>
+  <div class="center-align" style="color: white"><%= messages.success %></div>
   <% } %>
   <div class="row">
     <form class="col s8 offset-s4" action="/forgot" method="post">

@@ -44,7 +44,7 @@ userRouter.get('/profile', isLoggedIn, function(req, res){
 // forgot password route that sends an email to the user with a link to reset their password
 userRouter.route('/forgot')
   .get(function(req, res) {
-    res.render('forgot', {user: req.user, flash: req.flash('hello')})
+    res.render('forgot', {user: req.user})
   })
   .post(function(req, res, next) {
   aSync.waterfall([
@@ -57,7 +57,7 @@ userRouter.route('/forgot')
     function(token, done) {
       User.findOne({'local.email': req.body.email}, function(err, user) {
         if (!user) {
-          req.flash('error', 'No account with that email address exists.');
+          req.flash('error','No account with that email address exists.');
           return res.redirect('/forgot');
         }
         user.local.resetPasswordToken = token;

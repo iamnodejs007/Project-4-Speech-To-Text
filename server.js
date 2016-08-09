@@ -7,7 +7,8 @@ var
   bodyParser = require('body-parser'),
   ejs = require('ejs'),
   ejsLayouts = require('express-ejs-layouts'),
-  flash = require('connect-flash'),
+  // flash = require('connect-flash'),
+  flash = require('express-flash'),
   session = require('express-session'), // used to create cookies
   cookieParser = require('cookie-parser'),
   methodOverride = require('method-override'),
@@ -29,7 +30,8 @@ mongoose.connect(process.env.DB_URL, function(err){
 
 
 // middleware
-app.use(express.static('./public'))
+app.use(express.static(__dirname + '/public'))
+// app.use(express.static('./public'))
 app.use(bodyParser.json())
 app.use(logger('dev'))
 app.use(bodyParser.urlencoded({ extended: false }));
